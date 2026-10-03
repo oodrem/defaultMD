@@ -1,0 +1,50 @@
+/* highlight.js 토큰 색 (GitHub 계열, 테마 토큰으로 라이트/다크 전환) */
+.hljs-comment,
+.hljs-quote {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-type,
+.hljs-doctag {
+  color: var(--hl-keyword);
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-meta .hljs-string {
+  color: var(--hl-string);
+}
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector-attr,
+.hljs-meta {
+  color: var(--hl-number);
+}
+.hljs-title,
+.hljs-section,
+.hljs-title.function_ {
+  color: var(--hl-title);
+}
+.hljs-built_in,
+.hljs-name,
+.hljs-tag,
+.hljs-symbol,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--hl-builtin);
+}
+.hljs-deletion {
+  color: var(--hl-keyword);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 600;
+}

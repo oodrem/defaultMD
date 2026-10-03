@@ -1,0 +1,97 @@
+/* 화면: 다이어그램 · 수식 · 쪽 나눔 표시 */
+.markdown-body .mermaid {
+  margin: 0 0 1em;
+  text-align: center;
+  overflow-x: auto;
+}
+.markdown-body .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+.markdown-body .mermaid-error {
+  color: #cf222e;
+  white-space: pre-wrap;
+}
+.markdown-body .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+.markdown-body .page-break {
+  margin: 1.5em 0;
+  border-top: 1px dashed var(--border);
+}
+
+/* 인쇄 전용 영역은 화면에 표시하지 않음 */
+#print-root {
+  display: none;
+}
+
+/* 인쇄(PDF): 앱 화면은 숨기고 문서만, 테마와 관계없이 밝은 색 */
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+  :root,
+  :root[data-theme='dark'],
+  :root:not([data-theme='light']) {
+    color-scheme: light;
+    --bg: #ffffff;
+    --bg-elev: #f6f8fa;
+    --bg-hover: #eaeef2;
+    --fg: #1f2328;
+    --fg-muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+    --code-bg: #f3f4f6;
+    --hl-comment: #6e7781;
+    --hl-keyword: #cf222e;
+    --hl-string: #0a3069;
+    --hl-number: #0550ae;
+    --hl-title: #8250df;
+    --hl-builtin: #116329;
+  }
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  body > :not(#print-root) {
+    display: none !important;
+  }
+  #print-root {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    font-size: 11pt;
+    color: var(--fg);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  #print-root :is(h1, h2, h3, h4, h5, h6) {
+    break-after: avoid;
+  }
+  #print-root :is(pre, table, img, blockquote, .mermaid, .katex-display, figure) {
+    break-inside: avoid;
+  }
+  #print-root pre,
+  #print-root pre code {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #print-root table {
+    display: table;
+    width: auto;
+    max-width: 100%;
+  }
+  #print-root a {
+    color: var(--accent);
+  }
+  #print-root .page-break {
+    break-after: page;
+    margin: 0;
+    border: 0;
+  }
+}
