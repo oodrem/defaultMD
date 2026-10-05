@@ -12,6 +12,7 @@ export const tauriPlatform: Platform = {
     await win.setFocus()
   },
 
+  onUpdateReady() {},
   onLaunchFiles() {},
   openFiles: async () => [],
   filesFromDrop: async () => ({ files: [], folders: [] }),

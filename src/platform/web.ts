@@ -34,6 +34,23 @@ async function readHandle(handle: FileSystemFileHandle): Promise<FileData> {
   return fromFile(await handle.getFile(), handle)
 }
 
+// ── 파일 연결(더블클릭)로 실행된 파일 ──
+// 앱 화면이 준비되기 전에 도착할 수 있으므로 모듈이 로드되는 즉시(앱 시작 직후) 받기 시작하고,
+// 앱이 onLaunchFiles로 받을 준비가 될 때까지 모아 둔다.
+const updateListeners = new Set<(apply: () => void) => void>()
+const launchBuffer: FileData[][] = []
+let launchCallback: ((files: FileData[]) => void) | null = null
+
+fsWin.launchQueue?.setConsumer(async ({ files }) => {
+  if (!files?.length) return
+  const data = (await Promise.all(files.map((h) => readHandle(h).catch(() => null)))).filter(
+    (f): f is FileData => f !== null,
+  )
+  if (!data.length) return
+  if (launchCallback) launchCallback(data)
+  else launchBuffer.push(data)
+})
+
 async function ensurePermission(handle: FileSystemHandle, mode: PermMode['mode']): Promise<boolean> {
   const h = handle as unknown as PermHandle
   if ((await h.queryPermission({ mode })) === 'granted') return true
@@ -152,14 +169,21 @@ export const webPlatform: Platform = {
   async ready() {
     if (import.meta.env.PROD) {
       const { registerSW } = await import('virtual:pwa-register')
-      registerSW({ immediate: true })
+      // 새 버전은 자동으로 새로고침하지 않고 앱에 알림 (편집 중 내용·실행 파일 보호)
+      const update = registerSW({
+        immediate: true,
+        onNeedRefresh: () => updateListeners.forEach((cb) => cb(() => update(true))),
+      })
     }
   },
 
+  onUpdateReady(cb) {
+    updateListeners.add(cb)
+  },
+
   onLaunchFiles(cb) {
-    fsWin.launchQueue?.setConsumer(async ({ files }) => {
-      if (files.length) cb(await Promise.all(files.map(readHandle)))
-    })
+    launchCallback = cb
+    for (const files of launchBuffer.splice(0)) cb(files)
   },
 
   async openFiles() {

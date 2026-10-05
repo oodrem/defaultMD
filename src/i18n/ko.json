@@ -146,5 +146,7 @@
   "welcome.subtitle": "가벼운 Markdown 뷰어 · 편집기",
   "welcome.recent": "최근 파일",
   "welcome.drop": "또는 파일·폴더를 여기에 끌어다 놓으세요",
-  "welcome.defaultApp": ".md 기본 앱으로 설정하기"
+  "welcome.defaultApp": ".md 기본 앱으로 설정하기",
+  "update.apply": "새 버전 적용",
+  "update.hint": "새 버전이 준비되었습니다. 누르면 앱을 다시 불러옵니다 (저장 안 한 내용이 있으면 먼저 묻습니다)"
 }

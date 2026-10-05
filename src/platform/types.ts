@@ -38,7 +38,9 @@ export interface Platform {
   readonly kind: 'web' | 'tauri'
   /** 첫 렌더 후 호출: 창 표시, 서비스 워커 등록 등 */
   ready(): Promise<void>
-  /** 파일 연결/더블클릭으로 실행된 파일 수신 (앱 실행 중 추가 실행 포함) */
+  /** 새 버전이 준비됨. apply()를 부르면 적용(새로고침) */
+  onUpdateReady(cb: (apply: () => void) => void): void
+  /** 파일 연결/더블클릭으로 실행된 파일 수신 (앱 실행 중 추가 실행 포함). 등록 전에 도착한 파일도 전달 */
   onLaunchFiles(cb: (files: FileData[]) => void): void
   /** 열기 대화상자 (취소 시 빈 배열) */
   openFiles(): Promise<FileData[]>

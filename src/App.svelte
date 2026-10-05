@@ -27,7 +27,7 @@
   import Toolbar from './components/Toolbar.svelte'
   import { i18n, setLang, t } from './i18n/index.svelte'
   import { setTheme, themeState, type Theme } from './theme/theme.svelte'
-  import type { DropResult, Platform } from './platform'
+  import type { DropResult, FileData, Platform } from './platform'
 
   let { platform }: { platform: Platform } = $props()
 
@@ -73,12 +73,33 @@
     appState.installed = platform.isInstalled()
     platform.onInstallAvailable((available) => (appState.installable = available))
     setTabClosedHandler((key) => import('./editor/setup').then((m) => m.editorStates.delete(key)))
-    // 지난 세션(탭·화면 분할) 복원 → 그다음 파일 연결로 실행된 파일 (launchQueue는 소비자 등록 전까지 대기)
-    const session = await platform.restoreSession()
-    restoreSnapshot(session.files, session.meta)
+
+    // 파일 연결(더블클릭)로 실행된 파일: 가장 먼저 받고, 세션 복원이 끝나면 연다
+    const launched: FileData[][] = []
+    platform.onLaunchFiles((files) => (restored ? openDocs(files) : launched.push(files)))
+
+    // 새 버전: 열린 문서가 없으면 바로 적용, 있으면 상태바에서 사용자가 적용
+    platform.onUpdateReady((apply) => {
+      if (restored && ws.docs.length === 0) apply()
+      else updateApply = apply
+    })
+
+    // 지난 세션(탭·화면 분할) 복원. 문제가 생기거나 오래 걸려도 실행 파일 열기를 막지 않음
+    try {
+      const session = await Promise.race([
+        platform.restoreSession(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('session timeout')), 3000)),
+      ])
+      restoreSnapshot(session.files, session.meta)
+    } catch (e) {
+      console.warn('세션 복원 실패', e)
+    }
     restored = true
-    platform.onLaunchFiles((files) => openDocs(files))
+    for (const files of launched.splice(0)) await openDocs(files)
   })
+
+  /** 새 버전 적용 (상태바 버튼) */
+  let updateApply = $state<(() => void) | null>(null)
 
   // 열린 탭·화면 분할 기억 (디스크에 있는 파일만)
   let sessionTimer: ReturnType<typeof setTimeout> | undefined
@@ -262,6 +283,9 @@
       <span class="msg">{status.message}</span>
     {/if}
     <span class="spacer"></span>
+    {#if updateApply}
+      <button class="update" title={t('update.hint')} onclick={() => updateApply?.()}>{t('update.apply')}</button>
+    {/if}
     <span>v{__APP_VERSION__} · {platform.kind}</span>
   </footer>
 
@@ -309,6 +333,15 @@
     border-top: 1px solid var(--border);
     white-space: nowrap;
     overflow: hidden;
+  }
+  .status .update {
+    font: inherit;
+    padding: 0 8px;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
   }
   .status .msg {
     color: var(--accent);

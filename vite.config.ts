@@ -18,7 +18,8 @@ export default defineConfig({
   plugins: [
     svelte(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // prompt: 새 버전을 받아 두고 적용 시점은 앱이 정함 (자동 새로고침 시 실행 파일·편집 내용 손실 방지)
+      registerType: 'prompt',
       injectRegister: false, // platform/web.ts에서 웹일 때만 등록
       includeAssets: ['icons/*.png'],
       manifest: {
@@ -57,9 +58,6 @@ export default defineConfig({
           },
         ],
         cleanupOutdatedCaches: true,
-        // injectRegister: false일 때는 플러그인이 자동 설정하지 않음 → 새 버전이 대기 상태로 멈추지 않도록 명시
-        skipWaiting: true,
-        clientsClaim: true,
       },
     }),
   ],

@@ -146,5 +146,7 @@
   "welcome.subtitle": "A lightweight Markdown viewer & editor",
   "welcome.recent": "Recent files",
   "welcome.drop": "or drop files or folders here",
-  "welcome.defaultApp": "Set as default .md app"
+  "welcome.defaultApp": "Set as default .md app",
+  "update.apply": "Apply update",
+  "update.hint": "A new version is ready. Click to reload the app (you'll be asked first if there are unsaved changes)"
 }
